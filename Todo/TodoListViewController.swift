@@ -11,16 +11,15 @@ import UIKit
 class TodoListViewController: UITableViewController {
     
     var itemArray = ["Find Mike", "Buy eggs", "Destroy Demogorgon"]
-    var textField = UITextField()
+    
+    let defaults = UserDefaults.standard
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        if let items = defaults.array(forKey: "TodoListArray") as? [String] {
+            itemArray = items
+        }
     }
 
     // MARK: - Table view data source
@@ -60,11 +59,16 @@ class TodoListViewController: UITableViewController {
     // MARK: - Add new items
     
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
+        var textField = UITextField()
+        
         let alert = UIAlertController(title: "Add New Todo", message: "", preferredStyle: .alert)
         
         let action = UIAlertAction(title: "Add", style: .default) { (action) in
             //what will happen once the user clicks add
-            self.itemArray.append(self.textField.text!)
+            self.itemArray.append(textField.text!)
+            
+            self.defaults.set(self.itemArray, forKey: "TodoListArray")
+            
             self.tableView.reloadData()
         }
         let cancel = UIAlertAction(title: "Cancel", style: .cancel) { (cancel) in
@@ -74,7 +78,7 @@ class TodoListViewController: UITableViewController {
         alert.addTextField { (alertTextField) in
             //setup
             alertTextField.placeholder = "Create new todo."
-            self.textField = alertTextField
+            textField = alertTextField
         }
         
         alert.addAction(cancel)
